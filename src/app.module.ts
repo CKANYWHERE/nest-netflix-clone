@@ -10,6 +10,7 @@ import { User } from './entity/user.entity';
 import { Movie } from './entity/movie.entity';
 import { Category } from './entity/category.entity';
 import { MovieContents } from './entity/movieContents.entity';
+import { MovieCategory } from './entity/movieCategory.entity';
 
 @Module({
   imports: [
@@ -20,7 +21,7 @@ import { MovieContents } from './entity/movieContents.entity';
       username: process.env.DATABASE_USER,
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE_NAME,
-      entities: [User, Movie, Category, MovieContents],
+      entities: [User, Movie, Category, MovieContents, MovieCategory],
       logging: true,
       autoLoadEntities: true,
       synchronize: true,

@@ -7,6 +7,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { MovieContents } from './movieContents.entity';
+import { MovieCategory } from './movieCategory.entity';
 
 @Entity()
 export class Movie extends BaseEntity {
@@ -30,4 +31,7 @@ export class Movie extends BaseEntity {
 
   @OneToMany(() => MovieContents, (movieContents) => movieContents.movie)
   movieContents: MovieContents[];
+
+  @OneToMany(() => MovieCategory, (moviceCategory) => moviceCategory.movie)
+  categories: MovieCategory[];
 }
