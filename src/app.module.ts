@@ -21,10 +21,12 @@ import { MovieCategory } from './entity/movieCategory.entity';
       username: process.env.DATABASE_USER,
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE_NAME,
+      port: Number(process.env.DATABASE_PORT),
+
       entities: [User, Movie, Category, MovieContents, MovieCategory],
       logging: true,
       autoLoadEntities: true,
-      synchronize: true,
+      synchronize: false,
       keepConnectionAlive: true,
     }),
     UsersModule,
