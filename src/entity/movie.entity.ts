@@ -32,6 +32,6 @@ export class Movie extends BaseEntity {
   @OneToMany(() => MovieContents, (movieContents) => movieContents.movie)
   movieContents: MovieContents[];
 
-  @OneToMany(() => MovieCategory, (moviceCategory) => moviceCategory.movie)
+  @OneToMany(() => MovieCategory, (movieCategory) => movieCategory.movie)
   categories: MovieCategory[];
 }

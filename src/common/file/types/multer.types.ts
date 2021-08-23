@@ -1,7 +1,8 @@
 import { Readable } from 'stream';
+import { S3 } from 'aws-sdk';
 
 export interface MulterFieldsRequest extends Request {
-  file1: [
+  video: [
     {
       buffer: Buffer | Uint8Array | Blob | string | Readable;
       location: string | undefined;
@@ -9,15 +10,7 @@ export interface MulterFieldsRequest extends Request {
       originalname: string | undefined;
     },
   ];
-  file2: [
-    {
-      buffer: Buffer | Uint8Array | Blob | string | Readable;
-      location: string | undefined;
-      key: string | undefined;
-      originalname: string | undefined;
-    },
-  ];
-  file3: [
+  thumbNail: [
     {
       buffer: Buffer | Uint8Array | Blob | string | Readable;
       location: string | undefined;
@@ -26,3 +19,8 @@ export interface MulterFieldsRequest extends Request {
     },
   ];
 }
+
+// export interface MulterVideoImgType {
+//   video: MulterFieldsRequest.video;
+//   thumbNail: MulterFieldsRequest[];
+// }

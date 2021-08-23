@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { S3 } from 'aws-sdk';
 import { v4 as uuid } from 'uuid';
 import { MulterFieldsRequest } from './types/multer.types';
+import { Multer } from 'multer';
 
 @Injectable()
 export class UploadFile {
@@ -52,14 +53,18 @@ export class UploadFile {
 
   async uploadFields(
     files: Express.Multer.File[],
-  ): Promise<S3.ManagedUpload.SendData[] | boolean> {
-    const s3 = this.getS3();
+  ): Promise<MulterFieldsRequest | null> {
+    console.log('files ==== ', files);
     const customFiles = files as unknown as MulterFieldsRequest;
-    const resData: S3.ManagedUpload.SendData[] = [];
+    if (!customFiles.video || !customFiles.thumbNail) {
+      return null;
+    }
+    const s3 = this.getS3();
+
     try {
-      if (customFiles.file1) {
-        for (const file of customFiles.file1) {
-          const uploadRes = await s3
+      if (customFiles.thumbNail) {
+        for (const file of customFiles.thumbNail) {
+          await s3
             .upload({
               Bucket: 'chang-netflix',
               Body: file.buffer,
@@ -67,13 +72,12 @@ export class UploadFile {
               Key: `${uuid()}-${file.originalname}`,
             })
             .promise();
-          resData.push(uploadRes);
         }
       }
 
-      if (customFiles.file2) {
-        for (const file of customFiles.file2) {
-          const uploadRes = await s3
+      if (customFiles.video) {
+        for (const file of customFiles.video) {
+          await s3
             .upload({
               Bucket: 'chang-netflix',
               Body: file.buffer,
@@ -81,28 +85,12 @@ export class UploadFile {
               Key: `${uuid()}-${file.originalname}`,
             })
             .promise();
-          resData.push(uploadRes);
         }
       }
-
-      if (customFiles.file3) {
-        for (const file of customFiles.file3) {
-          const uploadRes = await s3
-            .upload({
-              Bucket: 'chang-netflix',
-              Body: file.buffer,
-              ACL: 'public-read',
-              Key: `${uuid()}-${file.originalname}`,
-            })
-            .promise();
-          resData.push(uploadRes);
-        }
-      }
-
-      return resData;
+      return customFiles;
     } catch (e) {
       console.log(e);
-      return false;
+      return null;
     }
   }
 

@@ -11,9 +11,12 @@ import { Movie } from './entity/movie.entity';
 import { Category } from './entity/category.entity';
 import { MovieContents } from './entity/movieContents.entity';
 import { MovieCategory } from './entity/movieCategory.entity';
+import { MorganInterceptor, MorganModule } from 'nest-morgan';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 
 @Module({
   imports: [
+    MorganModule,
     ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
       type: 'mysql',
@@ -22,7 +25,6 @@ import { MovieCategory } from './entity/movieCategory.entity';
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE_NAME,
       port: Number(process.env.DATABASE_PORT),
-
       entities: [User, Movie, Category, MovieContents, MovieCategory],
       logging: true,
       autoLoadEntities: true,
@@ -34,6 +36,12 @@ import { MovieCategory } from './entity/movieCategory.entity';
     CategoriesModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: MorganInterceptor('dev'),
+    },
+  ],
 })
 export class AppModule {}

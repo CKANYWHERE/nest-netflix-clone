@@ -8,8 +8,8 @@ import {
   Delete,
   UseInterceptors,
   UploadedFiles,
-  Req,
-  UploadedFile,
+  Res,
+  HttpStatus,
 } from '@nestjs/common';
 import { MoviesService } from './movies.service';
 import { CreateMovieDto } from './dto/create-movie.dto';
@@ -20,6 +20,7 @@ import {
   FilesInterceptor,
 } from '@nestjs/platform-express';
 import { UploadFile } from '../common/file/uploadFile';
+import * as Http from 'http';
 
 @Controller('movies')
 export class MoviesController {
@@ -29,8 +30,29 @@ export class MoviesController {
   ) {}
 
   @Post()
-  create(@Body() createMovieDto: CreateMovieDto) {
-    return this.moviesService.create(createMovieDto);
+  @UseInterceptors(
+    FileFieldsInterceptor([
+      { name: 'video', maxCount: 10 },
+      { name: 'thumbNail', maxCount: 10 },
+    ]),
+  )
+  async create(
+    @Body() createMovieDto: CreateMovieDto,
+    @UploadedFiles() files: Express.Multer.File[],
+    @Res() res,
+  ) {
+    const fileArray = await this.uploadFile.uploadFields(files);
+    if (fileArray) {
+      const body = await this.moviesService.create(createMovieDto, fileArray);
+      return res.status(HttpStatus.CREATED).json({
+        message: 'CREATED',
+        body: body,
+      });
+    } else {
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        message: 'FILE_NOT_INCLUDED',
+      });
+    }
   }
 
   @Get()
