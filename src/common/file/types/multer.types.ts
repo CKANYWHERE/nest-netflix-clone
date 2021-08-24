@@ -20,7 +20,23 @@ export interface MulterFieldsRequest extends Request {
   ];
 }
 
-// export interface MulterVideoImgType {
-//   video: MulterFieldsRequest.video;
-//   thumbNail: MulterFieldsRequest[];
-// }
+export interface MulterFieldsResponse {
+  video: S3.ManagedUpload.SendData[];
+  thumbNail: S3.ManagedUpload.SendData[];
+}
+
+export interface MulterPipeLine {
+  video: {
+    bucket: string | undefined;
+    key: string | undefined;
+    originalname: string | undefined;
+    path: string | undefined;
+  }[];
+
+  thumbNail: {
+    bucket: string | undefined;
+    key: string | undefined;
+    originalname: string | undefined;
+    path: string | undefined;
+  }[];
+}

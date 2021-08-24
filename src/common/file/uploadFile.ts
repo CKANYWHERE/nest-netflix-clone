@@ -1,7 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { S3 } from 'aws-sdk';
 import { v4 as uuid } from 'uuid';
-import { MulterFieldsRequest } from './types/multer.types';
+import {
+  MulterFieldsRequest,
+  MulterFieldsResponse,
+  MulterPipeLine,
+} from './types/multer.types';
 import { Multer } from 'multer';
 
 @Injectable()
@@ -53,18 +57,20 @@ export class UploadFile {
 
   async uploadFields(
     files: Express.Multer.File[],
-  ): Promise<MulterFieldsRequest | null> {
-    console.log('files ==== ', files);
+  ): Promise<MulterPipeLine | null> {
     const customFiles = files as unknown as MulterFieldsRequest;
     if (!customFiles.video || !customFiles.thumbNail) {
       return null;
     }
-    const s3 = this.getS3();
+    const pipeline = {} as MulterPipeLine;
+    pipeline.thumbNail = [];
+    pipeline.video = [];
 
+    const s3 = this.getS3();
     try {
       if (customFiles.thumbNail) {
         for (const file of customFiles.thumbNail) {
-          await s3
+          const uploadRes = await s3
             .upload({
               Bucket: 'chang-netflix',
               Body: file.buffer,
@@ -72,12 +78,19 @@ export class UploadFile {
               Key: `${uuid()}-${file.originalname}`,
             })
             .promise();
+
+          pipeline.thumbNail.push({
+            bucket: uploadRes.Bucket,
+            key: uploadRes.Key,
+            originalname: file.originalname,
+            path: uploadRes.Location,
+          });
         }
       }
 
       if (customFiles.video) {
         for (const file of customFiles.video) {
-          await s3
+          const uploadRes = await s3
             .upload({
               Bucket: 'chang-netflix',
               Body: file.buffer,
@@ -85,9 +98,15 @@ export class UploadFile {
               Key: `${uuid()}-${file.originalname}`,
             })
             .promise();
+          pipeline.video.push({
+            bucket: uploadRes.Bucket,
+            key: uploadRes.Key,
+            originalname: file.originalname,
+            path: uploadRes.Location,
+          });
         }
       }
-      return customFiles;
+      return pipeline;
     } catch (e) {
       console.log(e);
       return null;
